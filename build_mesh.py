@@ -21,7 +21,7 @@ def save_train_rgbs(path, rgbs):
 def sample_data(dir, n=10):
     rgb_imgs, depth_imgs, masks, boxes, poses = [], [], [], [], []
     rgb_paths = random.sample(glob(os.path.join(dir, '*-color.png')), n)
-    save_train_rgbs('train_rgbs.txt', rgb_paths)
+    save_train_rgbs('train_imgs.txt', rgb_paths)
     depth_paths = [rp.replace('-color.png', '-depth.png') for rp in rgb_paths]
     mask_paths = [rp.replace('-color.png', '-label.png') for rp in rgb_paths]
     box_paths = [rp.replace('-color.png', '-box.txt') for rp in rgb_paths]
@@ -35,7 +35,6 @@ def sample_data(dir, n=10):
         masks.append(np.asarray(mask_map, dtype=bool))
         boxes.append(np.loadtxt(box_path, delimiter='\n', dtype=int))
         poses.append(np.loadtxt(pose_path))
-    # print(poses)
     return rgb_imgs, depth_imgs, masks, boxes, poses
 
 
