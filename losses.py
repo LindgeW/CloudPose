@@ -144,19 +144,9 @@ def get_loss(end_points):
     axag_pred = end_points['axag_pred']
     axag_label = end_points['axag_label']
 
-    point_class = end_points['point_clouds'][:, 0, 3:].double()
     trans_loss, trans_perLoss = get_translation_error(translate_pred.double(), translate_label.double())
     axag_loss, axag_perLoss = get_rotation_error(axag_pred.double(), axag_label.double())
     total_loss = 10 * trans_loss + axag_loss
-    total_perloss = 10 * trans_perLoss + axag_perLoss
-
-    trans_perLoss = torch.unsqueeze(trans_perLoss, dim=0).t() * point_class
-    trans_clsLoss = torch.sum(trans_perLoss, dim=0) / torch.sum(point_class, dim=0)
-    axag_perLoss = torch.unsqueeze(axag_perLoss, dim=0).t() * point_class
-    axag_clsLoss = torch.sum(axag_perLoss, dim=0) / torch.sum(point_class, dim=0)
-    total_perloss = torch.unsqueeze(total_perloss, dim=0).t() * point_class
-    total_clsLoss = torch.sum(total_perloss, dim=0) / torch.sum(point_class, dim=0)
-
     end_points['trans_loss'] = trans_loss
     end_points['axag_loss'] = axag_loss
     end_points['total_loss'] = total_loss
