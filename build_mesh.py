@@ -59,11 +59,12 @@ def get_pc_seg(depth_map, seg):
     # Object点云
     obj_pc = o3d.geometry.PointCloud()
     obj_pc.points = o3d.utility.Vector3dVector(full_pc[seg].reshape(-1, 3))
-    obj_pc = obj_pc.remove_statistical_outlier(nb_neighbors=50, std_ratio=2)[0]
+    obj_pc = obj_pc.remove_statistical_outlier(nb_neighbors=30, std_ratio=2)[0]
     return obj_pc
 
 
 def run():
+    random.seed(1357)
     rgbs, depths, masks, boxes, poses = sample_data('../dataset/ape', 10)
     bb = False
     # merge_pc = []
@@ -93,7 +94,7 @@ def run():
     merge_pcd = o3d.geometry.PointCloud()
     # merge_pcd.points = o3d.utility.Vector3dVector(np.concatenate(merge_pc, axis=0))
     merge_pcd.points = o3d.utility.Vector3dVector(mesh)
-    merge_pcd = merge_pcd.remove_statistical_outlier(nb_neighbors=50, std_ratio=2)[0]
+    merge_pcd = merge_pcd.remove_statistical_outlier(nb_neighbors=30, std_ratio=2)[0]
     o3d.visualization.draw_geometries([merge_pcd],
                                       window_name="Object Point Cloud",
                                       width=1000,

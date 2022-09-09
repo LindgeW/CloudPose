@@ -14,6 +14,7 @@ width, height, fx, fy, cx, cy = K['width'], K['height'], K['fx'], K['fy'], K['cx
 def sample_data(dir, num_test=1, train_path=None):
     rgb_imgs, depth_imgs, masks, boxes, poses = [], [], [], [], []
     if train_path is None:
+        random.seed(1347)
         rgb_paths = random.sample(glob(os.path.join(dir, '*-color.png')), num_test)
         # rgb_paths = glob(os.path.join(dir, '*-color.png'))[:num_test]
     else:
@@ -53,7 +54,7 @@ def get_pc_bb(depth_map, box):
     # Object点云
     obj_pc = o3d.geometry.PointCloud()
     obj_pc.points = o3d.utility.Vector3dVector(full_pc[left: left+h, top: top+w].reshape(-1, 3))
-    obj_pc = obj_pc.remove_statistical_outlier(nb_neighbors=50, std_ratio=2)[0]
+    obj_pc = obj_pc.remove_statistical_outlier(nb_neighbors=10, std_ratio=1)[0]
     return obj_pc
 
 
@@ -65,13 +66,14 @@ def get_pc_seg(depth_map, seg):
     # Object点云
     obj_pc = o3d.geometry.PointCloud()
     obj_pc.points = o3d.utility.Vector3dVector(full_pc[seg].reshape(-1, 3))
-    obj_pc = obj_pc.remove_statistical_outlier(nb_neighbors=50, std_ratio=2)[0]
+    obj_pc = obj_pc.remove_statistical_outlier(nb_neighbors=10, std_ratio=1)[0]
     return obj_pc
 
 
 def run():
+    random.seed(3349)
     # rgbs, depths, masks, boxes, poses = sample_data('../dataset/ape', 10)
-    rgbs, depths, masks, boxes, poses = sample_data('../dataset/ape', 10, 'train_imgs.txt')
+    rgbs, depths, masks, boxes, poses = sample_data('../dataset/ape', 300, 'train_imgs.txt')
     bb = False
     for i in range(len(rgbs)):
         if bb:
@@ -79,8 +81,10 @@ def run():
         else:
             obj_pc = get_pc_seg(depths[i], masks[i])
 
-        o3d.io.write_point_cloud(f'scans/my_val/scan_{i}.xyz', obj_pc)
-        np.savetxt(f'scans/my_val/pose_{i}.txt', poses[i])
+        if len(obj_pc.points) < 1:
+            continue
+        o3d.io.write_point_cloud(f'scans/my_train/scan_{i}.xyz', obj_pc)
+        np.savetxt(f'scans/my_train/pose_{i}.txt', poses[i])
 
     print('Test Set Done !')
 

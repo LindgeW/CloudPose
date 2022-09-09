@@ -34,15 +34,12 @@ class CloudPose_trans(nn.Module):
         x = F.relu(self.bn3(self.conv3(x)))
         x = F.relu(self.bn4(self.conv4(x)))
         x = F.relu(self.bn5(self.conv5(x)))
-
         max_indices = torch.argmax(x, dim=1)
-
         x = torch.max(x, 2, keepdim=True)[0]
-        x = x.view(batch_size, 1024)
+        x = x.reshape(batch_size, 1024)
         x = F.relu(self.bn6(self.fc1(x)))
         x = F.relu(self.bn7(self.fc2(x)))
         x = self.fc3(x)
-
         return x, max_indices
 
 
@@ -76,11 +73,9 @@ class CloudPose_rot(nn.Module):
         x = F.relu(self.bn3(self.conv3(x)))
         x = F.relu(self.bn4(self.conv4(x)))
         x = F.relu(self.bn5(self.conv5(x)))
-
         max_indices = torch.argmax(x, dim=1)
-
         x = torch.max(x, 2, keepdim=True)[0]
-        x = x.view(batch_size, 1024)
+        x = x.reshape(batch_size, 1024)
         x = F.relu(self.bn6(self.fc1(x)))
         x = F.relu(self.bn7(self.fc2(x)))
         x = self.fc3(x)
@@ -100,8 +95,6 @@ class CloudPose_all(nn.Module):
         base_xyz = torch.mean(point_clouds_tp[:, :self.channel, :], dim=2)
         point_clouds_res = point_clouds_tp[:, :self.channel, :] - base_xyz.unsqueeze(-1)  # b 3 1
         t, ind_t = self.trans(point_clouds_res)
-        r, ind_r = self.rot(point_clouds_res)  # better than point_clouds_tp
-        end_points = {}
-        end_points['translate_pred'] = t + base_xyz  # b 3
-        end_points['axag_pred'] = r    # b 3
+        r, ind_r = self.rot(point_clouds_res)   # better than point_clouds_tp
+        end_points = {'translate_pred': t + base_xyz, 'axag_pred': r}
         return end_points

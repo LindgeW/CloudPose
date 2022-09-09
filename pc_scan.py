@@ -41,8 +41,8 @@ def filter_pc_bg(pc, eps=1e-10):   # 注：传入的是相机坐标系下的点�
 # 如何避免从物体斜下方去拍？
 def get_trans(N=1, seed=1347):
     np.random.seed(seed)
-    R = Rot.random(N).as_matrix()
-    T = np.random.randn(N, 3)
+    R = Rot.random(N).as_matrix()  # N x 3 x 3
+    T = np.random.randn(N, 3)  # N x 3
     return R, T
 
 
@@ -75,7 +75,8 @@ def pc_scan(mesh, num=1):
         cam_pcd.points = o3d.utility.Vector3dVector((R @ np.asarray(pcd.points).T).T)
         D = np.linalg.norm(np.asarray(cam_pcd.get_max_bound()) - np.asarray(cam_pcd.get_min_bound()))
         diameter = np.linalg.norm(T)
-        assert diameter >= D
+        if diameter < D:
+            continue
         # 设置隐点移除参数
         camera = [0, 0, -diameter]  # 视点位置
         radius = diameter * 100     # The radius of the spherical projection (球面投影的半径)
@@ -92,4 +93,4 @@ def pc_scan(mesh, num=1):
         #                                   point_show_normal=True)
 
 
-pc_scan('depth2pc.xyz', 500)
+pc_scan('depth2pc.xyz', 1000)

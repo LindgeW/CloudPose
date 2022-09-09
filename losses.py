@@ -38,21 +38,15 @@ def exponential_map(axag, EPS=1e-2):
     :return: B, 3, 3 tensor
     """
     ss = skew_symmetric(axag)
-
     theta_sq = torch.sum(axag.pow(2), dim=1)
-
     is_angle_small = torch.lt(theta_sq, EPS)
-
     theta = torch.sqrt(theta_sq)
-
     theta_pow_4 = theta_sq * theta_sq
     theta_pow_6 = theta_sq * theta_sq * theta_sq
     theta_pow_8 = theta_sq * theta_sq * theta_sq * theta_sq
-
     term_1 = torch.where(is_angle_small,
                          1 - (theta_sq / 6.0) + (theta_pow_4 / 120) - (theta_pow_6 / 5040) + (theta_pow_8 / 362880),
                          torch.sin(theta) / theta)
-
     term_2 = torch.where(is_angle_small,
                          0.5 - (theta_sq / 24.0) + (theta_pow_4 / 720) - (theta_pow_6 / 40320) + (
                                  theta_pow_8 / 3628800),
@@ -146,7 +140,8 @@ def get_loss(end_points):
 
     trans_loss, trans_perLoss = get_translation_error(translate_pred.double(), translate_label.double())
     axag_loss, axag_perLoss = get_rotation_error(axag_pred.double(), axag_label.double())
-    total_loss = 10 * trans_loss + axag_loss
+    # total_loss = 10 * trans_loss + axag_loss
+    total_loss = trans_loss + axag_loss
     end_points['trans_loss'] = trans_loss
     end_points['axag_loss'] = axag_loss
     end_points['total_loss'] = total_loss

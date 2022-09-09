@@ -50,7 +50,6 @@ class MyDataset(Dataset):
             point_cloud = point_cloud[:, 0:6]
             point_cloud[:, 3:] = (point_cloud[:, 3:] - MEAN_COLOR_RGB)
 
-        print(len(point_cloud))
         # ------------------------------- LABELS ------------------------------
         ret_dict = {}
         point_cloud = random_sampling(point_cloud, self.num_points)
@@ -58,6 +57,7 @@ class MyDataset(Dataset):
         matrix33 = pose[:3, :3]
         axag = cv2.Rodrigues(matrix33)[0].flatten()   # 旋转矩阵转旋转向量
         translate = pose[:3, 3]
+        ret_dict['rot_trans_label'] = pose    # 3 x 4
         ret_dict['axag_label'] = axag.astype(np.float32)
         ret_dict['translate_label'] = translate.astype(np.float32)
         return ret_dict
