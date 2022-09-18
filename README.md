@@ -1,2 +1,2 @@
 # CloudPose
-Pose Estimation with Point Cloud
+6DoF Object Pose Estimation with Point Cloud
