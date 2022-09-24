@@ -43,6 +43,9 @@ def get_trans(N=1, seed=1347):
     np.random.seed(seed)
     R = Rot.random(N).as_matrix()  # N x 3 x 3
     T = np.random.randn(N, 3)  # N x 3
+    T[:, 0] = T[:, 0].clip(min=-1, max=1)  # N x 3
+    T[:, 1] = T[:, 1].clip(min=-1, max=1)  # N x 3
+    T[:, 2] = T[:, 2].clip(min=0.7, max=1)  # N x 3
     return R, T
 
 
